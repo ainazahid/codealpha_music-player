@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="wrapper">
+        <header>
+            <button class="hdbtn">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h3 class="p-now">Playing Now</h3>
+            <button class="hdbtn">
+                <i class="fas fa-list"></i>
+            </button>
+        </header>
+        <div class="player">
+            <div class="img-area">
+                <img src="pic.jpeg" alt="Music Art" id="music-img">
+            </div>
+            <div class="song-details">
+                <h1 class="name">Animation</h1>
+                <h3 class="artist">Coding</h3>
+            </div>
+            <div class="audioC">
+                <div class="song-timer">
+                    <span class="current-time">0:00</span>
+                    <span class="max-duration">0:00</span>
+                </div>
+                <div class="progress-area">
+                    <div class="progress-bar">
+                        <audio id="main-audio" src="music-1.mp3"></audio>
+                    </div>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="btnC" id="prev">
+                    <i class="fas fa-backward"></i>
+                </button>
+                <button class="play-pause btnC">
+                    <i class="fas fa-play play"></i>
+                </button>
+                <button class="btnC" id="next">
+                    <i class="fas fa-forward"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+<script>
+const wrapper = document.querySelector(".wrapper"),
+    musicImg = wrapper.querySelector("img"),
+    musicName = wrapper.querySelector(".name"),
+    musicArtist = wrapper.querySelector(".artist"),
+    playPauseBtn = wrapper.querySelector(".play-pause"),
+    prevBtn = wrapper.querySelector("#prev"),
+    nextBtn = wrapper.querySelector("#next"),
+    mainAudio = wrapper.querySelector("#main-audio"),
+    progressArea = wrapper.querySelector(".progress-area"),
+    progressBar = wrapper.querySelector(".progress-bar"),
+    currentTimeDisplay = wrapper.querySelector(".current-time"),
+    durationDisplay = wrapper.querySelector(".max-duration");
+
+let musicIndex = 1;
+let isMusicPaused = true;
+
+window.addEventListener("load", () => {
+    loadMusic(musicIndex);
+});
+
+function loadMusic(indexNumb) {
+    musicName.innerText = allMusic[indexNumb - 1].name;
+    musicArtist.innerText = allMusic[indexNumb - 1].artist;
+    musicImg.src = allMusic[indexNumb - 1].img + ".jpg";
+    mainAudio.src = allMusic[indexNumb - 1].src + ".mp3";
+}
+
+
+function playMusic() {
+    wrapper.classList.add("paused");
+    playPauseBtn.querySelector("i").classList.replace("fa-play", "fa-pause");
+    mainAudio.play();
+}
+
+function pauseMusic() {
+    wrapper.classList.remove("paused");
+    playPauseBtn.querySelector("i").classList.replace("fa-pause", "fa-play");
+    mainAudio.pause();
+}
+
+playPauseBtn.addEventListener("click", () => {
+    isMusicPaused ? playMusic() : pauseMusic();
+    isMusicPaused = !isMusicPaused;
+});
+
+prevBtn.addEventListener("click", () => {
+    musicIndex--;
+    if (musicIndex < 1) musicIndex = allMusic.length;
+    loadMusic(musicIndex);
+    playMusic();
+});
+
+nextBtn.addEventListener("click", () => {
+    musicIndex++;
+    if (musicIndex > allMusic.length) musicIndex = 1;
+    loadMusic(musicIndex);
+    playMusic();
+});
+
+
+function updateProgressBar() {
+    const { currentTime, duration } = mainAudio;
+    const progress = (currentTime / duration) * 100;
+    progressBar.value = progress;
+
+    const minutes = Math.floor(currentTime / 60);
+    const seconds = Math.floor(currentTime % 60);
+    currentTimeDisplay.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+    const durationMinutes = Math.floor(duration / 60);
+    const durationSeconds = Math.floor(duration % 60);
+    durationDisplay.textContent = `${durationMinutes}:${durationSeconds < 10 ? '0' : ''}${durationSeconds}`;
+}
+
+function seek(e) {
+    const offsetX = e.offsetX;
+    const totalWidth = progressArea.clientWidth;
+    const percentage = (offsetX / totalWidth) * 100;
+    progressBar.value = percentage;
+    mainAudio.currentTime = (percentage / 100) * mainAudio.duration;
+}
+
+mainAudio.addEventListener("timeupdate", updateProgressBar);
+progressArea.addEventListener("click", seek);
+
+
+mainAudio.addEventListener("loadedmetadata", () => {
+    const durationMinutes = Math.floor(mainAudio.duration / 60);
+    const durationSeconds = Math.floor(mainAudio.duration % 60);
+    durationDisplay.textContent = `${durationMinutes}:${durationSeconds < 10 ? '0' : ''}${durationSeconds}`;
+});
+
+
+
+let allMusic = [
+    {
+        name: "Tauba Tauba",
+        artist: "Karan Aujla",
+       img: "img-7",
+        src: "music-4"
+    },
+    {
+        name: "So High",
+        artist: "Sidhu Moose Wala",
+        img: "img-2",
+        src: "music-3"
+    },
+    {
+        name: "You and Me",
+        artist: "Shubh",
+        img: "img-3",
+        src: "music-2"
+    },
+    {
+        name: "Born to Shine",
+        artist: "Diljit Dosanjh",
+        img: "img-4",
+        src: "music-1"
+    }
+];
+
+    </script>
+</body>
+</html>
